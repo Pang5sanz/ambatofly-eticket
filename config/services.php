@@ -31,4 +31,16 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'payment' => [
+        'bank_transfer' => [
+            'bank' => env('ADMIN_BANK_NAME', 'BCA'),
+            'account_number' => env('ADMIN_BANK_ACCOUNT', '1234567890'),
+            'account_name' => env('ADMIN_BANK_HOLDER', 'PT E-Ticket Indonesia'),
+        ],
+        'e_wallet' => [
+            'provider' => env('ADMIN_WALLET_PROVIDER', 'DANA / GoPay / OVO'),
+            'account_number' => env('ADMIN_WALLET_ACCOUNT', '08123456789'),
+            'account_name' => env('ADMIN_WALLET_HOLDER', 'E-Ticket'),
+        ],
+    ],
 ];

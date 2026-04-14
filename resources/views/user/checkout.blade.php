@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Checkout Pembayaran - E-Ticket</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -36,9 +37,19 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-10px) rotate(1deg); }
-            66% { transform: translateY(10px) rotate(-1deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            33% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            66% {
+                transform: translateY(10px) rotate(-1deg);
+            }
         }
 
         .container {
@@ -58,6 +69,7 @@
                 opacity: 0;
                 transform: translateY(-30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -208,7 +220,8 @@
             width: 20px;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 12px 15px;
             border-radius: 12px;
@@ -219,7 +232,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             border-color: #3ad0c3;
             outline: none;
             box-shadow: 0 0 0 3px rgba(58, 208, 195, 0.1);
@@ -266,6 +280,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -287,160 +302,192 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <a class="nav-back" href="/dashboard">
-        <i class="fas fa-arrow-left"></i>
-        Kembali ke Dashboard
-    </a>
+    <div class="container">
+        <a class="nav-back" href="/dashboard">
+            <i class="fas fa-arrow-left"></i>
+            Kembali ke Dashboard
+        </a>
 
-    <div class="header">
-        <h1>💳 Checkout Pembayaran</h1>
-    </div>
+        <div class="header">
+            <h1>💳 Checkout Pembayaran</h1>
+        </div>
 
-    <div class="order-summary">
-        <h3>📄 Ringkasan Pesanan</h3>
-        <div class="order-item">
-            <div class="order-label">🚡 Maskapai</div>
-            <div class="order-value">{{ $booking->schedule->plane_name }}</div>
-        </div>
-        <div class="order-item">
-            <div class="order-label">📍 Rute</div>
-            <div class="order-value">{{ $booking->schedule->origin }} → {{ $booking->schedule->destination }}</div>
-        </div>
-        <div class="order-item">
-            <div class="order-label">🕐 Keberangkatan</div>
-            <div class="order-value">{{ $booking->schedule->departure }}</div>
-        </div>
-        <div class="order-item">
-            <div class="order-label">🪑 Jumlah Kursi</div>
-            <div class="order-value">{{ $booking->total_seats }} kursi</div>
-        </div>
-        <div class="passenger-list">
-            <div style="font-weight: 600; margin-bottom: 10px; color: #333;">👥 Penumpang:</div>
-            @if($booking->passenger_details)
-                @foreach(json_decode($booking->passenger_details, true) as $passenger)
+        <div class="order-summary">
+            <h3>📄 Ringkasan Pesanan</h3>
+            <div class="order-item">
+                <div class="order-label">🚡 Maskapai</div>
+                <div class="order-value">{{ $booking->schedule->plane_name }}</div>
+            </div>
+            <div class="order-item">
+                <div class="order-label">📍 Rute</div>
+                <div class="order-value">{{ $booking->schedule->origin }} → {{ $booking->schedule->destination }}</div>
+            </div>
+            <div class="order-item">
+                <div class="order-label">🕐 Keberangkatan</div>
+                <div class="order-value">{{ $booking->schedule->departure }}</div>
+            </div>
+            <div class="order-item">
+                <div class="order-label">🪑 Jumlah Kursi</div>
+                <div class="order-value">{{ $booking->total_seats }} kursi</div>
+            </div>
+            <div class="passenger-list">
+                <div style="font-weight: 600; margin-bottom: 10px; color: #333;">👥 Penumpang:</div>
+                @if($booking->passenger_details)
+                    @foreach(json_decode($booking->passenger_details, true) as $passenger)
+                        <div class="passenger-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ $passenger['name'] }} ({{ $passenger['email'] }})</span>
+                        </div>
+                    @endforeach
+                @else
                     <div class="passenger-item">
-                        <i class="fas fa-user-circle"></i>
-                        <span>{{ $passenger['name'] }} ({{ $passenger['email'] }})</span>
+                        <i class="fas fa-info-circle"></i>
+                        <span>Tidak ada data penumpang</span>
                     </div>
-                @endforeach
-            @else
-                <div class="passenger-item">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Tidak ada data penumpang</span>
+                @endif
+            </div>
+        </div>
+
+        <div class="total-box">
+            <div class="total-label">Total Pembayaran</div>
+            <div class="total-amount">Rp {{ number_format($booking->total_price) }}</div>
+        </div>
+
+        <form action="/checkout/{{ $booking->id }}" method="POST" enctype="multipart/form-data">
+            @csrf
+
+            @if ($errors->any())
+                <div
+                    style="background: #fff4e5; color: #663c00; border: 1px solid #ffd8a8; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                    <strong>Periksa kembali data Anda:</strong>
+                    <ul style="margin-top: 10px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
-        </div>
-    </div>
 
-    <div class="total-box">
-        <div class="total-label">Total Pembayaran</div>
-        <div class="total-amount">Rp {{ number_format($booking->total_price) }}</div>
-    </div>
+            <div class="form-section">
+                <h3>📄 Informasi Pembayaran</h3>
 
-    <form action="/checkout/{{ $booking->id }}" method="POST" enctype="multipart/form-data">
-        @csrf
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-user label-icon"></i>
+                        Nama Pelanggan
+                    </label>
+                    <input type="text" name="customer_name" value="{{ Auth::user()->name }}" required>
+                </div>
 
-        @if ($errors->any())
-            <div style="background: #fff4e5; color: #663c00; border: 1px solid #ffd8a8; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-                <strong>Periksa kembali data Anda:</strong>
-                <ul style="margin-top: 10px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-envelope label-icon"></i>
+                        Email
+                    </label>
+                    <input type="email" name="customer_email" value="{{ Auth::user()->email }}" required>
+                </div>
 
-        <div class="form-section">
-            <h3>📄 Informasi Pembayaran</h3>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-phone label-icon"></i>
+                        No. Telepon
+                    </label>
+                    <input type="text" name="customer_phone" placeholder="No. Telepon" required>
+                </div>
 
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-user label-icon"></i>
-                    Nama Pelanggan
-                </label>
-                <input type="text" name="customer_name" value="{{ Auth::user()->name }}" required>
-            </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-credit-card label-icon"></i>
+                        Metode Pembayaran
+                    </label>
+                    <select name="payment_method" required>
+                        <option value="">-- Pilih Metode --</option>
+                        <option value="credit_card" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'credit_card' ? 'selected' : '' }}>💳 Kartu Kredit</option>
+                        <option value="bank_transfer" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'bank_transfer' ? 'selected' : '' }}>🏦 Transfer Bank</option>
+                        <option value="e_wallet" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'e_wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
+                        <option value="cash" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'cash' ? 'selected' : '' }}>💵 Tunai</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-envelope label-icon"></i>
-                    Email
-                </label>
-                <input type="email" name="customer_email" value="{{ Auth::user()->email }}" required>
-            </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-university label-icon"></i>
+                        Detail Pembayaran
+                    </label>
 
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-phone label-icon"></i>
-                    No. Telepon
-                </label>
-                <input type="text" name="customer_phone" placeholder="No. Telepon" required>
-            </div>
+                    <div id="payment_detail" class="passenger-card" style="display:none;"></div>
+                </div>
 
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-credit-card label-icon"></i>
-                    Metode Pembayaran
-                </label>
-                <select name="payment_method" required>
-                    <option value="">-- Pilih Metode --</option>
-                    <option value="credit_card" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'credit_card' ? 'selected' : '' }}>💳 Kartu Kredit</option>
-                    <option value="bank_transfer" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'bank_transfer' ? 'selected' : '' }}>🏦 Transfer Bank</option>
-                    <option value="e_wallet" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'e_wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
-                    <option value="cash" {{ old('payment_method', $booking->payment->payment_method ?? '') == 'cash' ? 'selected' : '' }}>💵 Tunai</option>
-                </select>
-            </div>
-
-            <div class="form-group payment-account-group" style="display:none;">
-                <label>
-                    <i class="fas fa-hashtag label-icon"></i>
-                    Nomor Rekening / E-Wallet
-                </label>
-                <input type="text" name="payment_account" value="{{ old('payment_account', $booking->payment->payment_account ?? '') }}" placeholder="Contoh: 1234567890" />
-                <small class="file-helper">Masukkan nomor rekening bila memilih bank transfer, atau nomor e-wallet jika memilih e-wallet.</small>
-            </div>
-
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-receipt label-icon"></i>
-                    Upload Bukti Pembayaran
-                </label>
-                <div class="file-input-wrapper">
-                    <input type="file" name="payment_proof" accept="image/jpeg,image/png,image/jpg" required>
-                    <small class="file-helper">📎 Format: JPG, JPEG, PNG | Max: 2MB</small>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-receipt label-icon"></i>
+                        Upload Bukti Pembayaran
+                    </label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="payment_proof" accept="image/jpeg,image/png,image/jpg" required>
+                        <small class="file-helper">📎 Format: JPG, JPEG, PNG | Max: 2MB</small>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <button type="submit" class="btn">
-            <i class="fas fa-lock"></i>
-            Bayar Sekarang
-        </button>
-    </form>
-</div>
+            <button type="submit" class="btn">
+                <i class="fas fa-lock"></i>
+                Bayar Sekarang
+            </button>
+        </form>
+    </div>
 
-<script>
-    const methodSelect = document.querySelector('select[name="payment_method"]');
-    const accountGroup = document.querySelector('.payment-account-group');
-    const accountInput = document.querySelector('input[name="payment_account"]');
+    <script>
+        const methodSelect = document.querySelector('select[name="payment_method"]');
+        const paymentDetail = document.getElementById('payment_detail');
 
-    function toggleAccountField() {
-        const value = methodSelect.value;
-        if (value === 'bank_transfer' || value === 'e_wallet') {
-            accountGroup.style.display = 'block';
-            accountInput.required = true;
-        } else {
-            accountGroup.style.display = 'none';
-            accountInput.required = false;
+        function showPaymentDetail() {
+            const value = methodSelect.value;
+            let html = '';
+
+            if (value === 'bank_transfer') {
+                html = `
+            <strong>🏦 Transfer Bank</strong><br><br>
+            Bank: <b>{{ config('services.payment.bank_transfer.bank') }}</b><br>
+            No Rekening Admin: <b>{{ config('services.payment.bank_transfer.account_number') }}</b><br>
+            A/N: <b>{{ config('services.payment.bank_transfer.account_name') }}</b>
+        `;
+            }
+            else if (value === 'e_wallet') {
+                html = `
+            <strong>📱 E-Wallet</strong><br><br>
+            {{ config('services.payment.e_wallet.provider') }}<br>
+            No Admin: <b>{{ config('services.payment.e_wallet.account_number') }}</b><br>
+            A/N: <b>{{ config('services.payment.e_wallet.account_name') }}</b>
+        `;
+            }
+            else if (value === 'credit_card') {
+                html = `
+            <strong>💳 Kartu Kredit</strong><br><br>
+            Silakan lanjutkan pembayaran melalui payment gateway.
+        `;
+            }
+            else if (value === 'cash') {
+                html = `
+            <strong>💵 Tunai</strong><br><br>
+            Silakan lakukan pembayaran di counter bandara.
+        `;
+            }
+
+            if (html !== '') {
+                paymentDetail.style.display = 'block';
+                paymentDetail.innerHTML = html;
+            } else {
+                paymentDetail.style.display = 'none';
+            }
         }
-    }
 
-    methodSelect.addEventListener('change', toggleAccountField);
-    document.addEventListener('DOMContentLoaded', toggleAccountField);
-</script>
+        methodSelect.addEventListener('change', showPaymentDetail);
+        document.addEventListener('DOMContentLoaded', showPaymentDetail);
+    </script>
 </body>
+
 </html>

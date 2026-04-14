@@ -249,9 +249,6 @@
                         <td data-label="Metode Pembayaran">
                             @if($b->payment)
                                 <div>{{ ucfirst(str_replace('_', ' ', $b->payment->payment_method)) }}</div>
-                                @if($b->payment->payment_account)
-                                    <small style="color: #666;">{{ $b->payment->payment_account }}</small>
-                                @endif
                             @else
                                 <span style="color: #999;">Belum ada</span>
                             @endif
